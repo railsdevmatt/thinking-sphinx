@@ -18,6 +18,14 @@ module ThinkingSphinx
         ThinkingSphinx::PostgreSQLAdapter.new model
       when Class
         adapter.new model
+      when "Octopus::Proxy"
+        if %w(mysql mysql2).include?(model.connection.config[:adapter])
+          ThinkingSphinx::MysqlAdapter.new model
+        elsif model.connection.config[:adapter] == "postgresql"
+          ThinkingSphinx::PostgreSQLAdapter.new model
+        else
+          raise "Invalid Database Adapter: Sphinx only supports MySQL and PostgreSQL"
+        end
       else
         raise "Invalid Database Adapter: Sphinx only supports MySQL and PostgreSQL, not #{adapter}"
       end
